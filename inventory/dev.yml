@@ -4,22 +4,17 @@ all:
       hosts:
         172.31.44.71:
           ansible_ssh_user: ec2-user
-          ansible_ssh_private_key_file: /home/ubuntu/my-server-key.pem
     webserver:
       hosts:
         172.31.33.239:
           ansible_ssh_user: ec2-user
-          ansible_ssh_private_key_file: /home/ubuntu/my-server-key.pem
         172.31.37.97:
           ansible_ssh_user: ec2-user
-          ansible_ssh_private_key_file: /home/ubuntu/my-server-key.pem
     db:
       hosts:
         172.31.46.99:
           ansible_ssh_user: ubuntu
-          ansible_ssh_private_key_file: /home/ubuntu/my-server-key.pem
     lb:
       hosts:
         172.31.44.45:
           ansible_ssh_user: ubuntu
-          ansible_ssh_private_key_file: /home/ubuntu/my-server-key.pem
