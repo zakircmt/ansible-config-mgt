@@ -6,8 +6,11 @@
     - include_tasks: ../dynamic-assignments/env-vars.yml
       tags:
         - always
-- hosts: all
+
 - import_playbook: ../static-assignments/common.yml
 
-- hosts: all
 - import_playbook: ../static-assignments/uat-webservers.yml
+
+- import_playbook: ../static-assignments/loadbalancers.yml
+
+- import_playbook: ../static-assignments/db-servers.yml

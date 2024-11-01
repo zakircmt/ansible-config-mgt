@@ -1,8 +1,9 @@
-all:
-  children:
-    uat-webservers:
-      hosts:
-        172.31.40.134:
-          ansible_ssh_user: ec2-user
-        172.31.42.151:
-          ansible_ssh_user: ec2-user
+[lb]
+load_balancer ansible_host=172.31.44.45 ansible_ssh_user='ubuntu'
+
+[uat_webservers]
+Web1 ansible_host=172.31.40.134 ansible_ssh_user='ec2-user'
+Web2 ansible_host=172.31.42.151 ansible_ssh_user='ec2-user'
+
+[db]
+db ansible_host=172.31.46.99 ansible_ssh_user='ubuntu'
