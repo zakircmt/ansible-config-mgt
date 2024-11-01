@@ -1,4 +1,45 @@
 ---
+- name: Add apache vhosts configuration.
+  template:
+    src: "{{ apache_vhosts_template }}"
+    dest: "{{ apache_conf_path }}/sites-available/{{ apache_vhosts_filename }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache
+  when: apache_create_vhosts | bool
+  become: yes
+
+- name: Enable Apache modules
+  ansible.builtin.shell:
+    cmd: "a2enmod {{ item }}"
+  loop:
+    - rewrite
+    - proxy
+    - proxy_balancer
+    - proxy_http
+    - headers
+    - lbmethod_bytraffic
+    - lbmethod_byrequests
+  notify: restart apache
+  become: yes
+
+- name: Insert load balancer configuration into Apache virtual host
+  ansible.builtin.blockinfile:
+    path: /etc/apache2/sites-available/000-default.conf
+    block: |
+      <Proxy "balancer://mycluster">
+        BalancerMember http://172.31.40.134:80
+        BalancerMember http://172.31.42.151:80
+        ProxySet lbmethod=byrequests
+      </Proxy>
+      ProxyPass "/" "balancer://mycluster/"
+      ProxyPassReverse "/" "balancer://mycluster/"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    insertbefore: "</VirtualHost>"
+  notify: restart apache
+  become: yes
+  
 - name: Configure Apache.
   lineinfile:
     dest: "{{ apache_server_root }}/ports.conf"
