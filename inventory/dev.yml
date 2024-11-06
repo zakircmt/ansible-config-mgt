@@ -1,20 +1,9 @@
-all:
-  children:
-    nfs:
-      hosts:
-        172.31.44.71:
-          ansible_ssh_user: ec2-user
-    webservers:
-      hosts:
-        172.31.33.239:
-          ansible_ssh_user: ec2-user
-        172.31.37.97:
-          ansible_ssh_user: ec2-user
-    db:
-      hosts:
-        172.31.46.99:
-          ansible_ssh_user: ubuntu
-    lb:
-      hosts:
-        172.31.44.45:
-          ansible_ssh_user: ubuntu
+[Nginx]
+load_balancer ansible_host=172.31.44.45 ansible_ssh_user='ubuntu'
+
+[tooling]
+Web1 ansible_host=172.31.44.186 ansible_ssh_user='ec2-user'
+Web2 ansible_host=172.31.46.107 ansible_ssh_user='ec2-user'
+
+[db]
+db ansible_host=172.31.46.99 ansible_ssh_user='ubuntu'
