@@ -51,7 +51,7 @@ pipeline {
                 sshagent(['private-key']) {
                     ansiblePlaybook(
                         become: true,
-                        credentialsId: 'private-key',
+                        credentialsId: 'f042d0b3-9125-4cdf-911c-bdc9e14eabe4',
                         disableHostKeyChecking: true,
                         installation: 'ansible',
                         inventory: '${WORKSPACE}/inventory/dev.yml',
