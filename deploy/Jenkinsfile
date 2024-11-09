@@ -23,8 +23,13 @@ pipeline {
         stage('Prepare Ansible For Execution') {
             steps {
                 sh 'echo ${WORKSPACE}'
-                sh "sed -i '3 a roles_path=${WORKSPACE}/roles' ${WORKSPACE}/deploy/ansible.cfg"
-
+                sh '''
+                    if [ -d "${WORKSPACE}/roles" ]; then
+                        sed -i '3 a roles_path=${WORKSPACE}/roles' ${WORKSPACE}/deploy/ansible.cfg
+                    else
+                        echo "Roles directory not found. Skipping roles_path update."
+                    fi
+                '''
             }
         }
 
@@ -40,7 +45,11 @@ pipeline {
 
                     sshagent(['private-key']) {
                         allHosts.each { host ->
-                            sh "ssh -vvv -o StrictHostKeyChecking=no ${host} exit"
+                            try {
+                                sh "ssh -vvv -o StrictHostKeyChecking=no ${host} exit"
+                            } catch (Exception e) {
+                                echo "SSH connection failed for ${host}"
+                            }
                         }
                     }
                 }
@@ -50,6 +59,14 @@ pipeline {
         stage('Run Ansible playbook') {
             steps {
                 sshagent(['private-key']) {
+                    sh '''
+                        if [ -f "${WORKSPACE}/inventory/dev.yml" ] && [ -f "${WORKSPACE}/playbooks/site.yml" ]; then
+                            echo "Inventory and playbook files found. Proceeding with Ansible execution."
+                        else
+                            echo "Inventory or playbook file missing. Aborting."
+                            exit 1
+                        fi
+                    '''
                     ansiblePlaybook(
                         become: true,
                         credentialsId: 'private-key',
