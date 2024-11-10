@@ -1,5 +1,5 @@
 [Nginx]
-load_balancer ansible_host=172.31.44.45 ansible_ssh_user='ubuntu'
+load_balancer ansible_host=172.31.93.44 ansible_ssh_user='ubuntu'
 
 [tooling]
 Web1 ansible_host=172.31.44.186 ansible_ssh_user='ec2-user'
