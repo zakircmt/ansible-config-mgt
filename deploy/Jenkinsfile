@@ -1,88 +1,35 @@
-pipeline {
+   pipeline {
     agent any
 
-    environment {
-        ANSIBLE_CONFIG = "${WORKSPACE}/deploy/ansible.cfg"
+  stages {
+    stage('Build') {
+      steps {
+        script {
+          sh 'echo "Building Stage"'
+        }
+      }
     }
 
-    stages {
-        stage('Initial cleanup') {
-            steps {
-                dir("${WORKSPACE}") {
-                    deleteDir()
-                }
-            }
+    stage('Test') {
+      steps {
+        script {
+          sh 'echo "Testing Stage"'
         }
-
-        stage('Checkout SCM') {
-            steps {
-                git branch: 'main', url: 'https://github.com/zakircmt/ansible-config-mgt.git'
-            }
+      }
+    }
+          stage('Package') {
+      steps {
+        script {
+          sh 'echo "Package Stage"'
         }
-
-        stage('Prepare Ansible For Execution') {
-            steps {
-                sh 'echo ${WORKSPACE}'
-                sh '''
-                    if [ -d "${WORKSPACE}/roles" ]; then
-                        sed -i '3 a roles_path=${WORKSPACE}/roles' ${WORKSPACE}/deploy/ansible.cfg
-                    else
-                        echo "Roles directory not found. Skipping roles_path update."
-                    fi
-                '''
-            }
+      }
+    }
+          stage('Deploy') {
+      steps {
+        script {
+          sh 'echo "Deploy Stage"'
         }
-
-        stage('Test SSH Connections') {
-            steps {
-                script {
-                    def allHosts = [
-                        'ubuntu@172.31.93.44',
-                        'ubuntu@172.31.46.99',
-                        'ec2-user@172.31.44.186',
-                        'ec2-user@172.31.46.107'
-                    ]
-
-                    sshagent(['private-key']) {
-                        allHosts.each { host ->
-                            try {
-                                sh "ssh -vvv -o StrictHostKeyChecking=no ${host} exit"
-                            } catch (Exception e) {
-                                echo "SSH connection failed for ${host}"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Run Ansible playbook') {
-            steps {
-                sshagent(['private-key']) {
-                    sh '''
-                        if [ -f "${WORKSPACE}/inventory/dev.yml" ] && [ -f "${WORKSPACE}/playbooks/site.yml" ]; then
-                            echo "Inventory and playbook files found. Proceeding with Ansible execution."
-                        else
-                            echo "Inventory or playbook file missing. Aborting."
-                            exit 1
-                        fi
-                    '''
-                    ansiblePlaybook(
-                        become: true,
-                        credentialsId: 'private-key',
-                        disableHostKeyChecking: true,
-                        installation: 'ansible',
-                        inventory: '${WORKSPACE}/inventory/dev.yml',
-                        playbook: '${WORKSPACE}/playbooks/site.yml'
-                    )
-                }
-            }
-        }
-
-        stage('Clean Workspace after build') {
-            steps {
-                cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenUnstable: true, deleteDirs: true)
-            }
-        }
+      }
+    }
     }
 }
