@@ -31,12 +31,6 @@
         }
       }
     }
-     stage('Clean up') {
-      steps {
-        script {
-          sh 'echo "Clean up Stage"'
-        }
-      }
-    }
+     
     }
 }
