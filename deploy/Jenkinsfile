@@ -27,25 +27,15 @@ pipeline {
             }
         }
 
-        stage('Test SSH Connections') {
-            steps {
-                script {
-                    def allHosts = [
-                        'ubuntu@172.31.93.44',
-                        'ubuntu@172.31.46.99',
-                        'ec2-user@172.31.44.186',
-                        'ec2-user@172.31.46.107'
-                    ]
-
-                    sshagent(['private-key']) {
-                        allHosts.each { host ->
-                            sh "ssh -o StrictHostKeyChecking=no ${host} exit"
-                        }
-                    }
-                }
-            }
+        stage('Test SSH Connection') {
+      steps {
+        sshagent(['private-key']) {
+          sh 'ssh -o StrictHostKeyChecking=no -i /home/ubuntu/.ssh/my-server-key.pem ec2-user@172.31.46.107 exit'
         }
+      }
+    }
 
+          
         stage('Run Ansible playbook') {
             steps {
                 sshagent(['private-key']) {
