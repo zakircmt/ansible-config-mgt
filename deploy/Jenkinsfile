@@ -17,7 +17,7 @@
 
     stage('Checkout SCM') {
       steps {
-        git branch: 'main', url: 'https://github.com/melkamu372/ansible-config-mgt.git'
+        git branch: 'main', url: 'https://github.com/zakircmt/ansible-config-mgt.git'
       }
     }
 
